@@ -13,6 +13,8 @@ import RegisterPage from './pages/RegisterPage';
 import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
 import ProfilePage from './pages/ProfilePage';
+import WelcomeScreen from './components/layout/WelcomeScreen';
+import EasterEggOverlay from './components/common/EasterEggOverlay';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -51,22 +53,25 @@ function AppShell() {
     return (
       <div className="page-loader">
         <div className="spinner" />
-        <p>Loading TaskFlow...</p>
+        <p>Loading IlhanFlow...</p>
       </div>
     );
   }
 
   return (
-    <Routes>
-      <Route path="/login" element={<LoginPage />} />
-      <Route path="/register" element={<RegisterPage />} />
-      <Route element={<AppLayout />}>
-        <Route path="/" element={<DashboardPage />} />
-        <Route path="/project/:projectId" element={<ProjectPage />} />
-        <Route path="/profile" element={<ProfilePage />} />
-      </Route>
-      <Route path="*" element={<Navigate to="/" replace />} />
-    </Routes>
+    <>
+      <Routes>
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route element={<AppLayout />}>
+          <Route path="/" element={<DashboardPage />} />
+          <Route path="/project/:projectId" element={<ProjectPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
+        </Route>
+        <Route path="*" element={<Navigate to="/" replace />} />
+      </Routes>
+      <WelcomeScreen />
+    </>
   );
 }
 
@@ -75,6 +80,8 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <BrowserRouter>
         <AppShell />
+        <WelcomeScreen />
+        <EasterEggOverlay />
         <ToastContainer />
         <Analytics />
       </BrowserRouter>

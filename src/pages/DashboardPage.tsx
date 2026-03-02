@@ -1,9 +1,10 @@
 import { Link } from 'react-router-dom';
-import { FolderKanban, Clock, CheckCircle2, AlertCircle, ArrowRight, PieChart as PieChartIcon } from 'lucide-react';
+import { FolderKanban, Clock, CheckCircle2, AlertCircle, ArrowRight, PieChart as PieChartIcon, XCircle } from 'lucide-react';
 import { useProjects } from '../hooks/useProjects';
 import { useState, useEffect } from 'react';
 import { subscribeToProjectTasks } from '../services/taskService';
 import ExternalDataWidget from '../components/dashboard/ExternalDataWidget';
+import { motion } from 'framer-motion';
 import {
     PieChart,
     Pie,
@@ -13,6 +14,7 @@ import {
     Legend
 } from 'recharts';
 import type { Task } from '../types';
+import Skeleton from '../components/common/Skeleton';
 
 export default function DashboardPage() {
     const { projects, loading: projectsLoading } = useProjects();
@@ -22,8 +24,10 @@ export default function DashboardPage() {
     // Subscribe to tasks from all projects to get recent ones
     useEffect(() => {
         if (projects.length === 0) {
-            setRecentTasks([]);
-            setTasksLoading(false);
+            if (!projectsLoading) {
+                setRecentTasks([]);
+                setTasksLoading(false);
+            }
             return;
         }
 
@@ -42,14 +46,14 @@ export default function DashboardPage() {
         });
 
         return () => unsubscribes.forEach((u) => u());
-    }, [projects]);
+    }, [projects, projectsLoading]);
 
     const statusIcon = (status: string) => {
         switch (status) {
             case 'done': return <CheckCircle2 size={14} className="status-icon done" />;
             case 'in-progress': return <Clock size={14} className="status-icon progress" />;
             case 'overdue': return <AlertCircle size={14} className="status-icon danger" />;
-            case 'cancelled': return <AlertCircle size={14} className="status-icon todo" />;
+            case 'cancelled': return <XCircle size={14} className="status-icon todo" />; // Using XCircle for Cancelled
             default: return <AlertCircle size={14} className="status-icon todo" />;
         }
     };
@@ -64,63 +68,66 @@ export default function DashboardPage() {
     };
 
     const chartData = [
-        { name: 'To Do', value: stats.todo, color: '#94a3b8' },
+        { name: 'To Do', value: stats.todo, color: '#f59e0b' },
         { name: 'In Progress', value: stats.inProgress, color: '#818cf8' },
         { name: 'Done', value: stats.done, color: '#34d399' },
         { name: 'Overdue', value: stats.overdue, color: '#f87171' },
-        { name: 'Cancelled', value: stats.cancelled, color: '#475569' },
+        { name: 'Cancelled', value: stats.cancelled, color: '#94a3b8' },
     ].filter(d => d.value > 0);
 
     return (
         <div className="dashboard-page">
             <div className="page-header">
-                <h1>Dashboard</h1>
-                <p>Overview of your projects and tasks</p>
+                <motion.h1 initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }}>Dashboard</motion.h1>
+                <motion.p initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.1 }}>Overview of your projects and tasks</motion.p>
             </div>
 
             {/* Stats Cards */}
             <div className="stats-grid">
-                <div className="stat-card">
-                    <div className="stat-icon projects">
-                        <FolderKanban size={22} />
-                    </div>
-                    <div className="stat-info">
-                        <span className="stat-value">{projects.length}</span>
-                        <span className="stat-label">Projects</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon todo">
-                        <AlertCircle size={22} />
-                    </div>
-                    <div className="stat-info">
-                        <span className="stat-value">{stats.todo}</span>
-                        <span className="stat-label">To Do</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon progress">
-                        <Clock size={22} />
-                    </div>
-                    <div className="stat-info">
-                        <span className="stat-value">{stats.inProgress}</span>
-                        <span className="stat-label">In Progress</span>
-                    </div>
-                </div>
-                <div className="stat-card">
-                    <div className="stat-icon done">
-                        <CheckCircle2 size={22} />
-                    </div>
-                    <div className="stat-info">
-                        <span className="stat-value">{stats.done}</span>
-                        <span className="stat-label">Done</span>
-                    </div>
-                </div>
+                {[
+                    { label: 'Projects', value: projects.length, icon: <FolderKanban size={24} />, color: 'projects', loading: projectsLoading },
+                    { label: 'To Do', value: stats.todo, icon: <AlertCircle size={24} />, color: 'todo', loading: tasksLoading },
+                    { label: 'In Progress', value: stats.inProgress, icon: <Clock size={24} />, color: 'progress', loading: tasksLoading },
+                    { label: 'Done', value: stats.done, icon: <CheckCircle2 size={24} />, color: 'done', loading: tasksLoading },
+                    { label: 'Overdue', value: stats.overdue, icon: <AlertCircle size={24} />, color: 'danger', loading: tasksLoading },
+                    { label: 'Cancelled', value: stats.cancelled, icon: <XCircle size={24} />, color: 'cancelled', loading: tasksLoading },
+                ].map((stat, i) => (
+                    <motion.div
+                        key={i}
+                        className="stat-card"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: i * 0.05 }}
+                    >
+                        <div className={`stat-icon ${stat.color}`}>
+                            {stat.icon}
+                        </div>
+                        <div className="stat-info">
+                            {stat.loading ? (
+                                <Skeleton width={40} height={28} />
+                            ) : (
+                                <motion.span
+                                    className="stat-value"
+                                    initial={{ scale: 0.8 }}
+                                    animate={{ scale: 1 }}
+                                >
+                                    {stat.value}
+                                </motion.span>
+                            )}
+                            <span className="stat-label">{stat.label}</span>
+                        </div>
+                    </motion.div>
+                ))}
             </div>
 
             <div className="dashboard-grid">
                 {/* Charts Widget */}
-                <div className="widget charts-widget">
+                <motion.div
+                    className="widget charts-widget"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.3 }}
+                >
                     <div className="widget-header">
                         <div className="header-with-icon">
                             <PieChartIcon size={18} />
@@ -129,8 +136,13 @@ export default function DashboardPage() {
                     </div>
                     <div className="widget-body">
                         {tasksLoading ? (
-                            <div className="widget-loading">
-                                <div className="spinner" />
+                            <div className="widget-loading-skeleton" style={{ padding: '1rem', display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                                <Skeleton height={200} borderRadius="50%" width={200} />
+                                <div style={{ marginTop: '1rem', display: 'flex', gap: '1rem', justifyContent: 'center' }}>
+                                    <Skeleton width={60} height={16} />
+                                    <Skeleton width={60} height={16} />
+                                    <Skeleton width={60} height={16} />
+                                </div>
                             </div>
                         ) : chartData.length === 0 ? (
                             <div className="widget-empty">
@@ -148,6 +160,8 @@ export default function DashboardPage() {
                                             outerRadius={80}
                                             paddingAngle={5}
                                             dataKey="value"
+                                            animationBegin={0}
+                                            animationDuration={1000}
                                         >
                                             {chartData.map((entry, index) => (
                                                 <Cell key={`cell-${index}`} fill={entry.color} />
@@ -168,17 +182,22 @@ export default function DashboardPage() {
                             </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
 
                 {/* Recent Tasks */}
-                <div className="widget recent-tasks-widget">
+                <motion.div
+                    className="widget recent-tasks-widget"
+                    initial={{ opacity: 0, scale: 0.95 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.4 }}
+                >
                     <div className="widget-header">
                         <h3>Recent Tasks</h3>
                     </div>
                     <div className="widget-body">
                         {projectsLoading || tasksLoading ? (
-                            <div className="widget-loading">
-                                <div className="spinner" />
+                            <div className="task-list">
+                                <Skeleton height={48} borderRadius={10} count={5} className="mb-2" />
                             </div>
                         ) : recentTasks.length === 0 ? (
                             <div className="widget-empty">
@@ -201,7 +220,7 @@ export default function DashboardPage() {
                             </div>
                         )}
                     </div>
-                </div>
+                </motion.div>
             </div>
 
             {/* External Data Widget at the bottom */}

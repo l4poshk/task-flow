@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, UserPlus, Github, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, User, Github, Eye, EyeOff } from 'lucide-react';
 import { registerWithEmail, loginWithGoogle, loginWithGithub } from '../services/authService';
 import { useNotificationStore } from '../stores/notificationStore';
 
@@ -73,11 +73,19 @@ export default function RegisterPage() {
         <div className="auth-page">
             <div className="auth-container">
                 <div className="auth-header">
-                    <div className="auth-logo">
-                        <UserPlus size={28} />
-                    </div>
-                    <h1>Create Account</h1>
-                    <p>Join TaskFlow and start tracking</p>
+                    <h1 style={{ fontWeight: 900, letterSpacing: '-0.04em', fontSize: '2.5rem', margin: '0 0 12px 0', display: 'flex', justifyContent: 'center' }}>
+                        <span style={{
+                            color: '#06b6d4',
+                            WebkitTextFillColor: '#06b6d4',
+                            background: 'none'
+                        }}>Ilhan</span>
+                        <span style={{
+                            background: 'var(--accent-gradient)',
+                            WebkitBackgroundClip: 'text',
+                            WebkitTextFillColor: 'transparent',
+                        }}>Flow</span>
+                    </h1>
+                    <p style={{ marginTop: 0 }}>Join the ultimate task tracker</p>
                 </div>
 
                 <form onSubmit={handleRegister} className="auth-form">

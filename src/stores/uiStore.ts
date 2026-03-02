@@ -10,6 +10,8 @@ interface UIState {
     setTheme: (theme: Theme) => void;
     toggleSidebar: () => void;
     setSidebarOpen: (open: boolean) => void;
+    easterEggStage: number;
+    setEasterEggStage: (stage: number) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -17,6 +19,7 @@ export const useUIStore = create<UIState>()(
         (set) => ({
             theme: 'dark',
             sidebarOpen: true,
+            easterEggStage: 0,
 
             toggleTheme: () =>
                 set((state) => ({
@@ -29,9 +32,11 @@ export const useUIStore = create<UIState>()(
                 set((state) => ({ sidebarOpen: !state.sidebarOpen })),
 
             setSidebarOpen: (open) => set({ sidebarOpen: open }),
+
+            setEasterEggStage: (stage) => set({ easterEggStage: stage }),
         }),
         {
-            name: 'task-tracker-ui',
+            name: 'ilhanflow-state',
         }
     )
 );

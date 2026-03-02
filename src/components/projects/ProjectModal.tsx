@@ -1,7 +1,8 @@
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Modal from '../common/Modal';
 import { createProject, updateProject } from '../../services/projectService';
 import { useAuthStore } from '../../stores/authStore';
+import { useUIStore } from '../../stores/uiStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import type { Project } from '../../types';
 
@@ -13,9 +14,24 @@ interface ProjectModalProps {
 export default function ProjectModal({ onClose, project }: ProjectModalProps) {
     const user = useAuthStore((s) => s.user);
     const addToast = useNotificationStore((s) => s.addToast);
+    const setEasterEggStage = useUIStore((s) => s.setEasterEggStage);
     const [title, setTitle] = useState(project?.title || '');
     const [description, setDescription] = useState(project?.description || '');
     const [loading, setLoading] = useState(false);
+
+    const audioRef = useRef<HTMLAudioElement | null>(null);
+
+    // Watch for "67" in project title to play sound
+    useEffect(() => {
+        if (title.trim() === '67' && audioRef.current) {
+            audioRef.current.currentTime = 0;
+            setEasterEggStage(1); // Show the empty bar immediately as feedback
+            audioRef.current.onended = () => {
+                // Keep stage at 1 during overlay, Stage 2 (filling) happens in EasterEggOverlay
+            };
+            audioRef.current.play().catch(e => console.error("Audio play failed:", e));
+        }
+    }, [title, setEasterEggStage]);
 
     const isEditing = !!project;
 
@@ -45,6 +61,8 @@ export default function ProjectModal({ onClose, project }: ProjectModalProps) {
 
     return (
         <Modal title={isEditing ? 'Edit Project' : 'New Project'} onClose={onClose}>
+            {/* Hidden audio element for the easter egg */}
+            <audio ref={audioRef} src="/sound-67.mp3" preload="auto" />
             <form onSubmit={handleSubmit} className="form">
                 <div className="form-group">
                     <label htmlFor="project-title">Title</label>
@@ -53,7 +71,7 @@ export default function ProjectModal({ onClose, project }: ProjectModalProps) {
                         type="text"
                         value={title}
                         onChange={(e) => setTitle(e.target.value)}
-                        placeholder="Enter project title..."
+                        placeholder="Enter project title... only not 67"
                         required
                         autoFocus
                     />

@@ -1,5 +1,5 @@
 import { useExternalPosts, useExternalUsers } from '../../hooks/useExternalData';
-import { Globe, RefreshCw, User } from 'lucide-react';
+import { Globe, RefreshCw, User, ExternalLink } from 'lucide-react';
 
 export default function ExternalDataWidget() {
     const { data: posts, isLoading: postsLoading, error: postsError, refetch, dataUpdatedAt } = useExternalPosts();
@@ -7,8 +7,9 @@ export default function ExternalDataWidget() {
 
     const isLoading = postsLoading || usersLoading;
 
-    const getUserName = (userId: number) => {
-        return users?.find((u) => u.id === userId)?.name || 'Unknown';
+    const getUserName = (post: any) => {
+        if (post.authorName) return post.authorName;
+        return users?.find((u) => u.id === post.userId)?.name || 'Unknown Author';
     };
 
     const lastUpdated = dataUpdatedAt
@@ -56,11 +57,25 @@ export default function ExternalDataWidget() {
                             <div key={post.id} className="external-post-card">
                                 <h4>{post.title}</h4>
                                 <p>{post.body.substring(0, 100)}...</p>
-                                <div className="post-meta">
+                                <div className="post-meta" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
                                     <span className="post-author">
                                         <User size={12} />
-                                        {getUserName(post.userId)}
+                                        {getUserName(post)}
                                     </span>
+                                    {post.url && (
+                                        <a
+                                            href={post.url}
+                                            target="_blank"
+                                            rel="noopener noreferrer"
+                                            className="external-post-link"
+                                            title="Read full article"
+                                            style={{ display: 'flex', alignItems: 'center', color: 'var(--accent-primary)', opacity: 0.8, transition: 'opacity 0.2s' }}
+                                            onMouseEnter={(e) => (e.currentTarget.style.opacity = '1')}
+                                            onMouseLeave={(e) => (e.currentTarget.style.opacity = '0.8')}
+                                        >
+                                            <ExternalLink size={14} />
+                                        </a>
+                                    )}
                                 </div>
                             </div>
                         ))}
