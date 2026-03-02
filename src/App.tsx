@@ -1,3 +1,4 @@
+import { Analytics } from '@vercel/analytics/react';
 import { BrowserRouter, Routes, Route, Navigate, Outlet } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { useEffect } from 'react';
@@ -75,6 +76,7 @@ export default function App() {
       <BrowserRouter>
         <AppShell />
         <ToastContainer />
+        <Analytics />
       </BrowserRouter>
     </QueryClientProvider>
   );
