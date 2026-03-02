@@ -5,9 +5,10 @@ import {
     signOut,
     updateProfile,
     onAuthStateChanged,
+    deleteUser,
     type User,
 } from 'firebase/auth';
-import { doc, setDoc, getDoc, serverTimestamp } from 'firebase/firestore';
+import { doc, setDoc, getDoc, deleteDoc, serverTimestamp } from 'firebase/firestore';
 import { auth, db, googleProvider, githubProvider, firebaseInitialized, isDemoMode } from './firebase';
 import type { UserProfile } from '../types';
 
@@ -95,6 +96,29 @@ export async function logout(): Promise<void> {
     }
     if (!firebaseInitialized) return;
     await signOut(auth);
+}
+
+// Delete Account
+export async function deleteAccount(): Promise<void> {
+    if (isDemoMode) {
+        localStorage.removeItem('taskflow_demo_user');
+        window.location.reload();
+        return;
+    }
+    if (!firebaseInitialized) return;
+    const user = auth.currentUser;
+    if (!user) throw new Error('Not authenticated');
+
+    // 1. Delete Firestore user profile
+    try {
+        const userRef = doc(db, 'users', user.uid);
+        await deleteDoc(userRef);
+    } catch (e) {
+        console.warn('Failed to delete Firestore user doc, proceeding with auth deletion');
+    }
+
+    // 2. Delete Auth user
+    await deleteUser(user);
 }
 
 // Update user profile

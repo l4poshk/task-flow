@@ -1,15 +1,18 @@
 import { useState } from 'react';
-import { Camera, Save, User } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+import { Camera, Save, User, Trash2 } from 'lucide-react';
 import { useAuthStore } from '../stores/authStore';
-import { updateUserProfile } from '../services/authService';
+import { updateUserProfile, deleteAccount, logout } from '../services/authService';
 import { useNotificationStore } from '../stores/notificationStore';
 
 export default function ProfilePage() {
     const user = useAuthStore((s) => s.user);
     const addToast = useNotificationStore((s) => s.addToast);
+    const navigate = useNavigate();
     const [displayName, setDisplayName] = useState(user?.displayName || '');
     const [photoURL, setPhotoURL] = useState(user?.photoURL || '');
     const [loading, setLoading] = useState(false);
+    const [deleting, setDeleting] = useState(false);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -26,6 +29,29 @@ export default function ProfilePage() {
             addToast('Failed to update profile', 'error');
         } finally {
             setLoading(false);
+        }
+    };
+
+    const handleDeleteAccount = async () => {
+        if (!window.confirm('Are you absolutely sure? This will permanently delete your account and profile data. This action cannot be undone.')) {
+            return;
+        }
+
+        setDeleting(true);
+        try {
+            await deleteAccount();
+            addToast('Account deleted successfully', 'success');
+            navigate('/login');
+        } catch (err: any) {
+            if (err.code === 'auth/requires-recent-login') {
+                addToast('For security, please log in again before deleting your account.', 'error');
+                await logout();
+                navigate('/login');
+            } else {
+                addToast(err.message || 'Failed to delete account', 'error');
+            }
+        } finally {
+            setDeleting(false);
         }
     };
 
@@ -87,16 +113,34 @@ export default function ProfilePage() {
                         />
                     </div>
 
-                    <button type="submit" className="btn btn-primary" disabled={loading}>
-                        {loading ? (
-                            <span className="btn-loading"><div className="spinner spinner-xs" /> Saving...</span>
-                        ) : (
-                            <>
-                                <Save size={16} />
-                                Save Changes
-                            </>
-                        )}
-                    </button>
+                    <div className="profile-actions">
+                        <button type="submit" className="btn btn-primary" disabled={loading || deleting}>
+                            {loading ? (
+                                <span className="btn-loading"><div className="spinner spinner-xs" /> Saving...</span>
+                            ) : (
+                                <>
+                                    <Save size={16} />
+                                    Save Changes
+                                </>
+                            )}
+                        </button>
+
+                        <button
+                            type="button"
+                            className="btn btn-danger"
+                            onClick={handleDeleteAccount}
+                            disabled={loading || deleting}
+                        >
+                            {deleting ? (
+                                <span className="btn-loading"><div className="spinner spinner-xs" /> Deleting...</span>
+                            ) : (
+                                <>
+                                    <Trash2 size={16} />
+                                    Delete Account
+                                </>
+                            )}
+                        </button>
+                    </div>
                 </form>
             </div>
         </div>

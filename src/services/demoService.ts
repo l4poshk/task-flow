@@ -26,6 +26,7 @@ function getLocalTasks(): Task[] {
     const tasks = JSON.parse(saved) as any[];
     return tasks.map(t => ({
         ...t,
+        dueDate: t.dueDate ? new Date(t.dueDate) : null,
         createdAt: new Date(t.createdAt),
         updatedAt: new Date(t.updatedAt)
     }));
@@ -83,6 +84,7 @@ export async function demoCreateTask(projectId: string, data: TaskFormData): Pro
         description: data.description,
         status: data.status,
         priority: data.priority,
+        dueDate: data.dueDate,
         assigneeId: data.assigneeId,
         assigneeName: null,
         createdAt: new Date(),

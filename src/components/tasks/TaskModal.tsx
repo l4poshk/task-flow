@@ -8,12 +8,15 @@ interface TaskModalProps {
     projectId: string;
     onClose: () => void;
     task?: Task;
+    initialStatus?: TaskStatus;
 }
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string }[] = [
     { value: 'todo', label: 'To Do' },
     { value: 'in-progress', label: 'In Progress' },
     { value: 'done', label: 'Done' },
+    { value: 'overdue', label: 'Overdue' },
+    { value: 'cancelled', label: 'Cancelled' },
 ];
 
 const PRIORITY_OPTIONS: { value: TaskPriority; label: string }[] = [
@@ -22,12 +25,15 @@ const PRIORITY_OPTIONS: { value: TaskPriority; label: string }[] = [
     { value: 'high', label: 'High' },
 ];
 
-export default function TaskModal({ projectId, onClose, task }: TaskModalProps) {
+export default function TaskModal({ projectId, onClose, task, initialStatus }: TaskModalProps) {
     const addToast = useNotificationStore((s) => s.addToast);
     const [title, setTitle] = useState(task?.title || '');
     const [description, setDescription] = useState(task?.description || '');
-    const [status, setStatus] = useState<TaskStatus>(task?.status || 'todo');
+    const [status, setStatus] = useState<TaskStatus>(task?.status || initialStatus || 'todo');
     const [priority, setPriority] = useState<TaskPriority>(task?.priority || 'medium');
+    const [dueDate, setDueDate] = useState<string>(
+        task?.dueDate ? task.dueDate.toISOString().split('T')[0] : ''
+    );
     const [loading, setLoading] = useState(false);
 
     const isEditing = !!task;
@@ -38,12 +44,14 @@ export default function TaskModal({ projectId, onClose, task }: TaskModalProps) 
 
         setLoading(true);
         try {
+            const dateObj = dueDate ? new Date(dueDate) : null;
             if (isEditing && task) {
                 await updateTask(projectId, task.id, {
                     title: title.trim(),
                     description: description.trim(),
                     status,
                     priority,
+                    dueDate: dateObj,
                     assigneeId: task.assigneeId,
                 });
                 addToast('Task updated!', 'success');
@@ -53,6 +61,7 @@ export default function TaskModal({ projectId, onClose, task }: TaskModalProps) 
                     description: description.trim(),
                     status,
                     priority,
+                    dueDate: dateObj,
                     assigneeId: null,
                 });
                 addToast('Task created!', 'success');
@@ -119,6 +128,18 @@ export default function TaskModal({ projectId, onClose, task }: TaskModalProps) 
                         </select>
                     </div>
                 </div>
+
+                {!['done', 'overdue', 'cancelled'].includes(status) && (
+                    <div className="form-group">
+                        <label htmlFor="task-duedate">Due Date</label>
+                        <input
+                            id="task-duedate"
+                            type="date"
+                            value={dueDate}
+                            onChange={(e) => setDueDate(e.target.value)}
+                        />
+                    </div>
+                )}
 
                 <div className="form-actions">
                     <button type="button" className="btn btn-ghost" onClick={onClose} disabled={loading}>

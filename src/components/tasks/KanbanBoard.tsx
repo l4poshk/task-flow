@@ -17,12 +17,40 @@ const COLUMNS: { id: TaskStatus; title: string; color: string }[] = [
     { id: 'todo', title: 'To Do', color: 'var(--status-todo)' },
     { id: 'in-progress', title: 'In Progress', color: 'var(--status-progress)' },
     { id: 'done', title: 'Done', color: 'var(--status-done)' },
+    { id: 'overdue', title: 'Overdue', color: '#f87171' }, // Red-400
+    { id: 'cancelled', title: 'Cancelled', color: '#94a3b8' }, // Slate-400
 ];
 
 export default function KanbanBoard({ projectId, tasks, loading }: KanbanBoardProps) {
     const addToast = useNotificationStore((s) => s.addToast);
     const [editingTask, setEditingTask] = useState<Task | null>(null);
     const [creatingInColumn, setCreatingInColumn] = useState<TaskStatus | null>(null);
+
+    // Auto-check for overdue tasks
+    useState(() => {
+        const checkOverdue = async () => {
+            const now = new Date();
+            for (const task of tasks) {
+                if (
+                    task.dueDate &&
+                    task.dueDate < now &&
+                    task.status !== 'done' &&
+                    task.status !== 'cancelled' &&
+                    task.status !== 'overdue'
+                ) {
+                    try {
+                        await updateTaskStatus(projectId, task.id, 'overdue');
+                    } catch (err) {
+                        console.error('Failed to auto-move to overdue:', err);
+                    }
+                }
+            }
+        };
+
+        const interval = setInterval(checkOverdue, 60000); // Check every minute
+        checkOverdue(); // Initial check
+        return () => clearInterval(interval);
+    });
 
     const handleDragEnd = async (result: DropResult) => {
         if (!result.destination) return;
@@ -59,7 +87,7 @@ export default function KanbanBoard({ projectId, tasks, loading }: KanbanBoardPr
                     {COLUMNS.map((column) => {
                         const columnTasks = getColumnTasks(column.id);
                         return (
-                            <div key={column.id} className="kanban-column">
+                            <div key={column.id} className="kanban-column" data-status={column.id}>
                                 <div className="kanban-column-header">
                                     <div className="column-title-row">
                                         <span className="column-dot" style={{ background: column.color }} />
@@ -117,6 +145,7 @@ export default function KanbanBoard({ projectId, tasks, loading }: KanbanBoardPr
             {creatingInColumn && (
                 <TaskModal
                     projectId={projectId}
+                    initialStatus={creatingInColumn}
                     onClose={() => setCreatingInColumn(null)}
                 />
             )}

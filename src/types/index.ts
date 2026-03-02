@@ -29,7 +29,7 @@ export interface ProjectFormData {
 }
 
 // --- Task ---
-export type TaskStatus = 'todo' | 'in-progress' | 'done';
+export type TaskStatus = 'todo' | 'in-progress' | 'done' | 'cancelled' | 'overdue';
 export type TaskPriority = 'low' | 'medium' | 'high';
 
 export interface Task {
@@ -38,6 +38,7 @@ export interface Task {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
+  dueDate: Date | null;
   assigneeId: string | null;
   assigneeName: string | null;
   projectId: string;
@@ -50,6 +51,7 @@ export interface TaskFormData {
   description: string;
   status: TaskStatus;
   priority: TaskPriority;
+  dueDate: Date | null;
   assigneeId: string | null;
 }
 

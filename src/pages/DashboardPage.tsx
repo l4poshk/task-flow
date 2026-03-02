@@ -1,9 +1,17 @@
 import { Link } from 'react-router-dom';
-import { FolderKanban, Clock, CheckCircle2, AlertCircle, ArrowRight } from 'lucide-react';
+import { FolderKanban, Clock, CheckCircle2, AlertCircle, ArrowRight, PieChart as PieChartIcon } from 'lucide-react';
 import { useProjects } from '../hooks/useProjects';
 import { useState, useEffect } from 'react';
 import { subscribeToProjectTasks } from '../services/taskService';
 import ExternalDataWidget from '../components/dashboard/ExternalDataWidget';
+import {
+    PieChart,
+    Pie,
+    Cell,
+    ResponsiveContainer,
+    Tooltip,
+    Legend
+} from 'recharts';
 import type { Task } from '../types';
 
 export default function DashboardPage() {
@@ -27,7 +35,7 @@ export default function DashboardPage() {
                 allTasks[project.id] = tasks;
                 const merged = Object.values(allTasks).flat();
                 merged.sort((a, b) => b.updatedAt.getTime() - a.updatedAt.getTime());
-                setRecentTasks(merged.slice(0, 8));
+                setRecentTasks(merged);
                 setTasksLoading(false);
             });
             unsubscribes.push(unsub);
@@ -40,6 +48,8 @@ export default function DashboardPage() {
         switch (status) {
             case 'done': return <CheckCircle2 size={14} className="status-icon done" />;
             case 'in-progress': return <Clock size={14} className="status-icon progress" />;
+            case 'overdue': return <AlertCircle size={14} className="status-icon danger" />;
+            case 'cancelled': return <AlertCircle size={14} className="status-icon todo" />;
             default: return <AlertCircle size={14} className="status-icon todo" />;
         }
     };
@@ -49,7 +59,17 @@ export default function DashboardPage() {
         todo: recentTasks.filter((t) => t.status === 'todo').length,
         inProgress: recentTasks.filter((t) => t.status === 'in-progress').length,
         done: recentTasks.filter((t) => t.status === 'done').length,
+        overdue: recentTasks.filter((t) => t.status === 'overdue').length,
+        cancelled: recentTasks.filter((t) => t.status === 'cancelled').length,
     };
+
+    const chartData = [
+        { name: 'To Do', value: stats.todo, color: '#94a3b8' },
+        { name: 'In Progress', value: stats.inProgress, color: '#818cf8' },
+        { name: 'Done', value: stats.done, color: '#34d399' },
+        { name: 'Overdue', value: stats.overdue, color: '#f87171' },
+        { name: 'Cancelled', value: stats.cancelled, color: '#475569' },
+    ].filter(d => d.value > 0);
 
     return (
         <div className="dashboard-page">
@@ -99,6 +119,57 @@ export default function DashboardPage() {
             </div>
 
             <div className="dashboard-grid">
+                {/* Charts Widget */}
+                <div className="widget charts-widget">
+                    <div className="widget-header">
+                        <div className="header-with-icon">
+                            <PieChartIcon size={18} />
+                            <h3>Task Distribution</h3>
+                        </div>
+                    </div>
+                    <div className="widget-body">
+                        {tasksLoading ? (
+                            <div className="widget-loading">
+                                <div className="spinner" />
+                            </div>
+                        ) : chartData.length === 0 ? (
+                            <div className="widget-empty">
+                                <p>Add tasks to see your progress chart!</p>
+                            </div>
+                        ) : (
+                            <div className="chart-container" style={{ height: '250px', width: '100%' }}>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <PieChart>
+                                        <Pie
+                                            data={chartData}
+                                            cx="50%"
+                                            cy="50%"
+                                            innerRadius={60}
+                                            outerRadius={80}
+                                            paddingAngle={5}
+                                            dataKey="value"
+                                        >
+                                            {chartData.map((entry, index) => (
+                                                <Cell key={`cell-${index}`} fill={entry.color} />
+                                            ))}
+                                        </Pie>
+                                        <Tooltip
+                                            contentStyle={{
+                                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                                border: '1px solid rgba(255, 255, 255, 0.1)',
+                                                borderRadius: '12px',
+                                                color: '#fff'
+                                            }}
+                                            itemStyle={{ color: '#fff' }}
+                                        />
+                                        <Legend />
+                                    </PieChart>
+                                </ResponsiveContainer>
+                            </div>
+                        )}
+                    </div>
+                </div>
+
                 {/* Recent Tasks */}
                 <div className="widget recent-tasks-widget">
                     <div className="widget-header">
@@ -115,7 +186,7 @@ export default function DashboardPage() {
                             </div>
                         ) : (
                             <div className="task-list">
-                                {recentTasks.map((task) => (
+                                {recentTasks.slice(0, 5).map((task) => (
                                     <Link
                                         key={task.id}
                                         to={`/project/${task.projectId}`}
@@ -131,8 +202,10 @@ export default function DashboardPage() {
                         )}
                     </div>
                 </div>
+            </div>
 
-                {/* External Data Widget */}
+            {/* External Data Widget at the bottom */}
+            <div style={{ marginTop: '2rem' }}>
                 <ExternalDataWidget />
             </div>
         </div>

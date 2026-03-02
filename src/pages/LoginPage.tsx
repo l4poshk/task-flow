@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, LogIn, Github } from 'lucide-react';
+import { Mail, Lock, LogIn, Github, Eye, EyeOff } from 'lucide-react';
 import { loginWithEmail, loginWithGoogle, loginWithGithub } from '../services/authService';
 import { useNotificationStore } from '../stores/notificationStore';
 
@@ -9,6 +9,7 @@ export default function LoginPage() {
     const addToast = useNotificationStore((s) => s.addToast);
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleEmailLogin = async (e: React.FormEvent) => {
@@ -82,15 +83,25 @@ export default function LoginPage() {
                             <Lock size={16} />
                             Password
                         </label>
-                        <input
-                            id="login-password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="••••••••"
-                            required
-                            minLength={6}
-                        />
+                        <div className="password-input-wrapper">
+                            <input
+                                id="login-password"
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="••••••••"
+                                required
+                                minLength={6}
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" className="btn btn-primary btn-full" disabled={loading}>

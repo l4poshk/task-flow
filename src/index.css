@@ -1257,9 +1257,11 @@ h4 {
 
 .kanban-board {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: var(--space-5);
+  grid-template-columns: repeat(5, 1fr);
+  gap: var(--space-4);
   min-height: 400px;
+  overflow-x: auto;
+  padding-bottom: var(--space-4);
 }
 
 .kanban-column {
@@ -1615,4 +1617,95 @@ h4 {
   .social-buttons {
     flex-direction: column;
   }
+}
+
+/* ---- Task Status & Date Enhancements ---- */
+.task-card-date {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  font-size: 0.75rem;
+  color: var(--text-muted);
+  margin-bottom: var(--space-3);
+  background: var(--bg-primary);
+  padding: 4px 8px;
+  border-radius: var(--radius-sm);
+  width: fit-content;
+}
+
+.task-card-date svg {
+  color: var(--accent-primary);
+}
+
+.status-icon.danger {
+  color: #f87171;
+}
+
+[data-status='overdue'] .task-card-title {
+  color: #f87171;
+}
+
+.kanban-column[data-status='overdue'] .column-dot {
+  background: #f87171 !important;
+}
+
+.kanban-column[data-status='cancelled'] .column-dot {
+  background: #94a3b8 !important;
+}
+
+/* ---- Password Toggle Styles ---- */
+.password-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.password-input-wrapper input {
+  padding-right: var(--space-10) !important;
+  width: 100%;
+}
+
+.password-toggle {
+  position: absolute;
+  right: var(--space-3);
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: var(--space-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-fast);
+  z-index: 2;
+}
+
+.password-toggle:hover {
+  color: var(--text-secondary);
+  background: var(--bg-hover);
+}
+
+/* ---- Profile Page Styles ---- */
+.profile-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--space-8);
+  margin-top: var(--space-8);
+  padding-top: var(--space-6);
+  border-top: 1px solid var(--border-subtle);
+}
+
+.btn-danger {
+  background: #f87171 !important;
+  color: white !important;
+  border: none !important;
+}
+
+.btn-danger:hover {
+  background: #ef4444 !important;
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
 }

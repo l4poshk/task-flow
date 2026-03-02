@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { Mail, Lock, User, UserPlus, Github } from 'lucide-react';
+import { Mail, Lock, User, UserPlus, Github, Eye, EyeOff } from 'lucide-react';
 import { registerWithEmail, loginWithGoogle, loginWithGithub } from '../services/authService';
 import { useNotificationStore } from '../stores/notificationStore';
 
@@ -11,6 +11,8 @@ export default function RegisterPage() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
     const [confirmPassword, setConfirmPassword] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [loading, setLoading] = useState(false);
 
     const handleRegister = async (e: React.FormEvent) => {
@@ -29,8 +31,16 @@ export default function RegisterPage() {
             await registerWithEmail(email, password, displayName || email.split('@')[0]);
             addToast('Account created successfully!', 'success');
             navigate('/');
-        } catch (err: unknown) {
-            const msg = err instanceof Error ? err.message : 'Registration failed';
+        } catch (err: any) {
+            let msg = 'Registration failed';
+
+            // Check for specific Firebase error codes
+            if (err.code === 'auth/email-already-in-use' || (typeof err.message === 'string' && err.message.includes('email-already-in-use'))) {
+                msg = 'This email is already registered. Please sign in or use a different email.';
+            } else if (err instanceof Error) {
+                msg = err.message;
+            }
+
             addToast(msg, 'error');
         } finally {
             setLoading(false);
@@ -106,15 +116,25 @@ export default function RegisterPage() {
                             <Lock size={16} />
                             Password
                         </label>
-                        <input
-                            id="reg-password"
-                            type="password"
-                            value={password}
-                            onChange={(e) => setPassword(e.target.value)}
-                            placeholder="Min 6 characters"
-                            required
-                            minLength={6}
-                        />
+                        <div className="password-input-wrapper">
+                            <input
+                                id="reg-password"
+                                type={showPassword ? 'text' : 'password'}
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                placeholder="Min 6 characters"
+                                required
+                                minLength={6}
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowPassword(!showPassword)}
+                                tabIndex={-1}
+                            >
+                                {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <div className="form-group">
@@ -122,15 +142,25 @@ export default function RegisterPage() {
                             <Lock size={16} />
                             Confirm Password
                         </label>
-                        <input
-                            id="reg-confirm"
-                            type="password"
-                            value={confirmPassword}
-                            onChange={(e) => setConfirmPassword(e.target.value)}
-                            placeholder="Repeat password"
-                            required
-                            minLength={6}
-                        />
+                        <div className="password-input-wrapper">
+                            <input
+                                id="reg-confirm"
+                                type={showConfirmPassword ? 'text' : 'password'}
+                                value={confirmPassword}
+                                onChange={(e) => setConfirmPassword(e.target.value)}
+                                placeholder="Repeat password"
+                                required
+                                minLength={6}
+                            />
+                            <button
+                                type="button"
+                                className="password-toggle"
+                                onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                tabIndex={-1}
+                            >
+                                {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                            </button>
+                        </div>
                     </div>
 
                     <button type="submit" className="btn btn-primary btn-full" disabled={loading}>

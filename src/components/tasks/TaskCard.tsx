@@ -1,5 +1,5 @@
 import { Draggable } from '@hello-pangea/dnd';
-import { Pencil, Trash2, GripVertical, Flag } from 'lucide-react';
+import { Pencil, Trash2, GripVertical, Flag, Clock } from 'lucide-react';
 import { deleteTask } from '../../services/taskService';
 import { useNotificationStore } from '../../stores/notificationStore';
 import type { Task } from '../../types';
@@ -36,6 +36,7 @@ export default function TaskCard({ task, index, onEdit }: TaskCardProps) {
             {(provided, snapshot) => (
                 <div
                     className={`task-card ${snapshot.isDragging ? 'dragging' : ''}`}
+                    data-status={task.status}
                     ref={provided.innerRef}
                     {...provided.draggableProps}
                 >
@@ -53,6 +54,13 @@ export default function TaskCard({ task, index, onEdit }: TaskCardProps) {
 
                     {task.description && (
                         <p className="task-card-desc">{task.description}</p>
+                    )}
+
+                    {task.dueDate && (
+                        <div className="task-card-date">
+                            <Clock size={12} />
+                            <span>Due: {task.dueDate.toLocaleDateString()}</span>
+                        </div>
                     )}
 
                     <div className="task-card-footer">
