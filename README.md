@@ -4,8 +4,6 @@
 
 **IlhanFlow** is a modern, high-performance task management application designed for teams. Built with a focus on speed, aesthetics, and real-time collaboration.
 
-![Dashboard Preview](https://via.placeholder.com/800x450?text=IlhanFlow+Dashboard)
-
 ## ✨ Features
 
 - **📊 Dynamic Dashboard**: Real-time statistics, task distribution charts (Recharts), and recent activity tracking.
