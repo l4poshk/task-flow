@@ -1,5 +1,5 @@
 import { Link, useNavigate, useLocation } from 'react-router-dom';
-import { LogOut, Sun, Moon, LayoutDashboard, User, Menu } from 'lucide-react';
+import { LogOut, Sun, Moon, Orbit, User, Menu } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUIStore } from '../../stores/uiStore';
 import { motion } from 'framer-motion';
@@ -52,7 +52,7 @@ export default function Navbar() {
 
             <div className="navbar-center" style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
                 <Link to="/" className={`nav-link ${isActive('/') ? 'active' : ''}`}>
-                    <LayoutDashboard size={16} />
+                    <Orbit size={18} />
                     <span>Dashboard</span>
                 </Link>
                 {easterEggStage >= 1 && (
