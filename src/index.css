@@ -1836,6 +1836,35 @@ body.is-resizing * {
   max-width: 100%;
 }
 
+.copy-input-group {
+  display: flex;
+  gap: var(--space-2);
+  align-items: stretch;
+}
+
+.copy-input-group input {
+  flex: 1;
+}
+
+.copy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 42px;
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: all var(--transition-fast);
+}
+
+.copy-btn:hover {
+  color: var(--accent-primary);
+  border-color: var(--accent-primary);
+  background: var(--accent-primary-subtle);
+}
+
 /* ---- Toasts ---- */
 .toast-container {
   position: fixed;

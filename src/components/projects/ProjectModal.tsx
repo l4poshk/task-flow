@@ -2,7 +2,6 @@ import { useState, useEffect, useRef } from 'react';
 import Modal from '../common/Modal';
 import { createProject, updateProject } from '../../services/projectService';
 import { useAuthStore } from '../../stores/authStore';
-import { useUIStore } from '../../stores/uiStore';
 import { useNotificationStore } from '../../stores/notificationStore';
 import type { Project } from '../../types';
 
@@ -14,24 +13,17 @@ interface ProjectModalProps {
 export default function ProjectModal({ onClose, project }: ProjectModalProps) {
     const user = useAuthStore((s) => s.user);
     const addToast = useNotificationStore((s) => s.addToast);
-    const setEasterEggStage = useUIStore((s) => s.setEasterEggStage);
     const [title, setTitle] = useState(project?.title || '');
     const [description, setDescription] = useState(project?.description || '');
     const [loading, setLoading] = useState(false);
-
     const audioRef = useRef<HTMLAudioElement | null>(null);
 
-    // Watch for "67" in project title to play sound
     useEffect(() => {
         if (title.trim() === '67' && audioRef.current) {
             audioRef.current.currentTime = 0;
-            setEasterEggStage(1); // Show the empty bar immediately as feedback
-            audioRef.current.onended = () => {
-                // Keep stage at 1 during overlay, Stage 2 (filling) happens in EasterEggOverlay
-            };
             audioRef.current.play().catch(e => console.error("Audio play failed:", e));
         }
-    }, [title, setEasterEggStage]);
+    }, [title]);
 
     const isEditing = !!project;
 

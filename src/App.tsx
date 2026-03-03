@@ -14,7 +14,6 @@ import DashboardPage from './pages/DashboardPage';
 import ProjectPage from './pages/ProjectPage';
 import ProfilePage from './pages/ProfilePage';
 import WelcomeScreen from './components/layout/WelcomeScreen';
-import EasterEggOverlay from './components/common/EasterEggOverlay';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -81,7 +80,6 @@ export default function App() {
       <BrowserRouter>
         <AppShell />
         <WelcomeScreen />
-        <EasterEggOverlay />
         <ToastContainer />
         <Analytics />
       </BrowserRouter>

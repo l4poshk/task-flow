@@ -103,6 +103,33 @@ export default function ProfilePage() {
                     </div>
 
                     <div className="form-group">
+                        <label htmlFor="profile-id">User ID (UID)</label>
+                        <div className="copy-input-group">
+                            <input
+                                id="profile-id"
+                                type="text"
+                                value={user?.uid || ''}
+                                readOnly
+                                className="input-disabled"
+                            />
+                            <button
+                                type="button"
+                                className="copy-btn"
+                                onClick={() => {
+                                    if (user?.uid) {
+                                        navigator.clipboard.writeText(user.uid);
+                                        addToast('User ID copied to clipboard!', 'success');
+                                    }
+                                }}
+                                title="Copy User ID"
+                            >
+                                <Save size={14} />
+                            </button>
+                        </div>
+                        <span className="form-hint">Share this ID to be invited to projects</span>
+                    </div>
+
+                    <div className="form-group">
                         <label htmlFor="profile-photo">Avatar URL</label>
                         <input
                             id="profile-photo"

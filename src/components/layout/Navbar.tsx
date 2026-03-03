@@ -2,7 +2,6 @@ import { Link, useNavigate, useLocation } from 'react-router-dom';
 import { LogOut, Sun, Moon, Orbit, User, Menu } from 'lucide-react';
 import { useAuth } from '../../hooks/useAuth';
 import { useUIStore } from '../../stores/uiStore';
-import { motion } from 'framer-motion';
 import { useNotificationStore } from '../../stores/notificationStore';
 import { logout } from '../../services/authService';
 
@@ -11,7 +10,6 @@ export default function Navbar() {
     const theme = useUIStore((s) => s.theme);
     const toggleTheme = useUIStore((s) => s.toggleTheme);
     const toggleSidebar = useUIStore((s) => s.toggleSidebar);
-    const easterEggStage = useUIStore((s) => s.easterEggStage);
     const addToast = useNotificationStore((s) => s.addToast);
     const navigate = useNavigate();
     const location = useLocation();
@@ -55,21 +53,6 @@ export default function Navbar() {
                     <Orbit size={18} />
                     <span>Dashboard</span>
                 </Link>
-                {easterEggStage >= 1 && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.8 }}
-                        animate={{ opacity: 1, scale: 1 }}
-                        className="easter-egg-progress-nav"
-                        title="Find them all."
-                    >
-                        {[1, 2, 3, 4, 5].map(step => (
-                            <div
-                                key={step}
-                                className={`egg-step ${step <= (easterEggStage - 1) ? 'filled' : ''}`}
-                            />
-                        ))}
-                    </motion.div>
-                )}
             </div>
 
             <div className="navbar-right">
