@@ -42,6 +42,12 @@ export default function Sidebar() {
                                     className={({ isActive }) =>
                                         `sidebar-link ${isActive ? 'active' : ''}`
                                     }
+                                    onClick={() => {
+                                        // Auto-close on mobile when clicking a project
+                                        if (window.innerWidth <= 768) {
+                                            useUIStore.getState().setSidebarOpen(false);
+                                        }
+                                    }}
                                 >
                                     <FolderKanban size={16} />
                                     <span>{project.title}</span>
@@ -51,6 +57,14 @@ export default function Sidebar() {
                     )}
                 </div>
             </aside>
+
+            {/* Mobile Sidebar Overlay */}
+            {sidebarOpen && (
+                <div
+                    className="sidebar-overlay-mobile"
+                    onClick={() => useUIStore.getState().setSidebarOpen(false)}
+                />
+            )}
 
             {showModal && <ProjectModal onClose={() => setShowModal(false)} />}
         </>
