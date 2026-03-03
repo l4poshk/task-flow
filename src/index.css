@@ -55,13 +55,14 @@
 }
 
 /* ---- Dark Theme (Default) ---- */
+/* ---- Midnight Aurora Theme Logic ---- */
 [data-theme='dark'] {
   --bg-primary: #0a0a12;
-  --bg-secondary: #12121f;
-  --bg-tertiary: #1a1a2e;
-  --bg-elevated: #22223b;
-  --bg-hover: #292942;
-  --bg-active: #32325a;
+  --bg-secondary: rgba(18, 18, 31, 0.9);
+  --bg-tertiary: rgba(26, 26, 46, 0.85);
+  --bg-elevated: rgba(34, 34, 59, 0.8);
+  --bg-hover: rgba(41, 41, 66, 0.85);
+  --bg-active: rgba(50, 50, 90, 0.9);
 
   --glass-bg: rgba(18, 18, 31, 0.75);
   --glass-border: rgba(255, 255, 255, 0.08);
@@ -189,8 +190,9 @@ body {
   position: relative;
 }
 
-/* ---- Midnight Aurora Starfield ---- */
-body::before {
+[data-theme='dark'] body::before,
+[data-theme='dark'] body::after,
+[data-theme='dark'] html::before {
   content: "";
   position: fixed;
   top: 0;
@@ -199,41 +201,109 @@ body::before {
   height: 100%;
   pointer-events: none;
   z-index: -1;
-  opacity: 0;
-  transition: opacity 1s ease;
-  background-image:
-    radial-gradient(1px 1px at 25px 35px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1px 1px at 50px 100px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1.5px 1.5px at 125px 235px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1px 1px at 150px 300px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1.5px 1.5px at 225px 435px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1px 1px at 250px 500px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1px 1px at 325px 635px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1px 1px at 350px 700px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1.5px 1.5px at 425px 835px, white, rgba(255, 255, 255, 0)),
-    radial-gradient(1px 1px at 450px 900px, white, rgba(255, 255, 255, 0));
-  background-size: 500px 500px;
-  animation: starsTwinkle 10s infinite alternate linear;
+  opacity: 0.6;
+  transition: opacity 1.5s ease;
 }
 
 [data-theme='dark'] body::before {
-  opacity: 0.15;
+  background-image:
+    radial-gradient(1px 1px at 10% 10%, #fef3c7, transparent),
+    radial-gradient(1px 1px at 20% 40%, #fef3c7, transparent),
+    radial-gradient(1px 1px at 40% 20%, #fde68a, transparent),
+    radial-gradient(1.2px 1.2px at 60% 80%, #fef3c7, transparent),
+    radial-gradient(1px 1px at 80% 60%, #fde68a, transparent),
+    radial-gradient(1px 1px at 90% 90%, #fef3c7, transparent),
+    radial-gradient(1px 1px at 15% 85%, #fef3c7, transparent),
+    radial-gradient(1.2px 1.2px at 85% 15%, #fde68a, transparent),
+    radial-gradient(1px 1px at 30% 70%, #fef3c7, transparent),
+    radial-gradient(1.2px 1.2px at 70% 30%, #fde68a, transparent),
+    radial-gradient(1px 1px at 5% 50%, #fef3c7, transparent),
+    radial-gradient(1px 1px at 95% 40%, #fde68a, transparent),
+    radial-gradient(1px 1px at 50% 10%, #fef3c7, transparent),
+    radial-gradient(1.1px 1.1px at 45% 95%, #fde68a, transparent);
+  background-size: 350px 350px;
+  animation: twinkle_slow 15s infinite alternate ease-in-out;
 }
 
-@keyframes starsTwinkle {
-  0% {
+[data-theme='dark'] body::after {
+  opacity: 0.45;
+  background-image:
+    radial-gradient(1.5px 1.5px at 15% 25%, #fef08a, transparent),
+    radial-gradient(1.8px 1.8px at 35% 75%, #fef08a, transparent),
+    radial-gradient(1.5px 1.5px at 65% 35%, #fcd34d, transparent),
+    radial-gradient(2px 2px at 85% 85%, #fef08a, transparent),
+    radial-gradient(1.5px 1.5px at 50% 50%, #fcd34d, transparent),
+    radial-gradient(1.8px 1.8px at 25% 65%, #fef08a, transparent),
+    radial-gradient(1.5px 1.5px at 75% 15%, #fcd34d, transparent),
+    radial-gradient(1.5px 1.5px at 10% 10%, #fef08a, transparent),
+    radial-gradient(1.8px 1.8px at 90% 20%, #fcd34d, transparent);
+  background-size: 450px 450px;
+  animation: twinkle_med 10s infinite alternate-reverse ease-in-out;
+}
+
+[data-theme='dark'] html::before {
+  opacity: 0.35;
+  background-image:
+    radial-gradient(2.2px 2.2px at 25% 45%, #fbbf24, transparent),
+    radial-gradient(2.5px 2.5px at 75% 15%, #fbbf24, transparent),
+    radial-gradient(2.2px 2.2px at 10% 90%, #f59e0b, transparent),
+    radial-gradient(2.5px 2.5px at 60% 60%, #fbbf24, transparent),
+    radial-gradient(2.2px 2.2px at 40% 10%, #f59e0b, transparent);
+  background-size: 650px 650px;
+  animation: twinkle_fast 6s infinite alternate ease-in-out;
+}
+
+[data-theme='dark'] body::before {
+  opacity: 0.6;
+}
+
+[data-theme='dark'] body::after {
+  opacity: 0.45;
+}
+
+[data-theme='dark'] html::before {
+  opacity: 0.35;
+}
+
+@keyframes twinkle_slow {
+
+  0%,
+  100% {
+    opacity: 0.6;
     transform: scale(1);
-    opacity: 0.15;
   }
 
   50% {
+    opacity: 0.35;
     transform: scale(1.05);
-    opacity: 0.1;
+  }
+}
+
+@keyframes twinkle_med {
+
+  0%,
+  100% {
+    opacity: 0.45;
+    transform: scale(1.1);
   }
 
-  100% {
+  50% {
+    opacity: 0.25;
     transform: scale(1);
+  }
+}
+
+@keyframes twinkle_fast {
+
+  0%,
+  100% {
+    opacity: 0.35;
+    filter: blur(0px);
+  }
+
+  50% {
     opacity: 0.15;
+    filter: blur(1px);
   }
 }
 
