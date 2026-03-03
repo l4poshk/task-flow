@@ -12,6 +12,8 @@ interface UIState {
     setSidebarOpen: (open: boolean) => void;
     easterEggStage: number;
     setEasterEggStage: (stage: number) => void;
+    sidebarWidth: number;
+    setSidebarWidth: (width: number) => void;
 }
 
 export const useUIStore = create<UIState>()(
@@ -34,6 +36,9 @@ export const useUIStore = create<UIState>()(
             setSidebarOpen: (open) => set({ sidebarOpen: open }),
 
             setEasterEggStage: (stage) => set({ easterEggStage: stage }),
+
+            sidebarWidth: 260,
+            setSidebarWidth: (width) => set({ sidebarWidth: width }),
         }),
         {
             name: 'ilhanflow-state',

@@ -1,18 +1,54 @@
 import { NavLink } from 'react-router-dom';
-import { FolderKanban, Plus } from 'lucide-react';
+import { FolderKanban, Plus, GripVertical } from 'lucide-react';
 import { useProjects } from '../../hooks/useProjects';
 import { useUIStore } from '../../stores/uiStore';
-import { useState } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import ProjectModal from '../projects/ProjectModal';
 
 export default function Sidebar() {
     const { projects, loading } = useProjects();
-    const sidebarOpen = useUIStore((s) => s.sidebarOpen);
+    const { sidebarOpen, sidebarWidth, setSidebarWidth } = useUIStore();
     const [showModal, setShowModal] = useState(false);
+    const isResizing = useRef(false);
+
+    const startResizing = useCallback((e: React.MouseEvent) => {
+        e.preventDefault();
+        isResizing.current = true;
+        document.body.classList.add('is-resizing');
+    }, []);
+
+    const stopResizing = useCallback(() => {
+        isResizing.current = false;
+        document.body.classList.remove('is-resizing');
+    }, []);
+
+    const resize = useCallback(
+        (e: MouseEvent) => {
+            if (isResizing.current) {
+                const newWidth = e.clientX;
+                if (newWidth >= 160 && newWidth <= 500) {
+                    setSidebarWidth(newWidth);
+                }
+            }
+        },
+        [setSidebarWidth]
+    );
+
+    useEffect(() => {
+        window.addEventListener('mousemove', resize);
+        window.addEventListener('mouseup', stopResizing);
+        return () => {
+            window.removeEventListener('mousemove', resize);
+            window.removeEventListener('mouseup', stopResizing);
+        };
+    }, [resize, stopResizing]);
 
     return (
         <>
-            <aside className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}>
+            <aside
+                className={`sidebar ${sidebarOpen ? 'open' : 'closed'}`}
+                style={{ '--sidebar-width': `${sidebarWidth}px` } as any}
+            >
                 <div className="sidebar-header">
                     <h3>Projects</h3>
                     <button className="icon-btn" onClick={() => setShowModal(true)} title="New project">
@@ -55,6 +91,11 @@ export default function Sidebar() {
                             ))}
                         </nav>
                     )}
+                </div>
+
+                {/* Resize Handle */}
+                <div className="sidebar-resizer" onMouseDown={startResizing}>
+                    <GripVertical size={14} className="resizer-icon" />
                 </div>
             </aside>
 
